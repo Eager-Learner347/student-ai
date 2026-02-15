@@ -11,6 +11,13 @@ The project focuses on building a structured, tool-enhanced AI system with futur
 Retrieval-Augmented Generation (RAG) and ethical hacking modules.
 
 
+## Hardware Support
+
+- Automatically detects CUDA GPU
+- Loads 4-bit quantized model if GPU available
+- Falls back to CPU mode if no GPU detected
+
+
 
 This project demonstrates practical implementation of:
 
