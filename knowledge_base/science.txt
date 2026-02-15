@@ -1,0 +1,8 @@
+Photosynthesis:
+Photosynthesis is the process by which green plants use sunlight to synthesize food from carbon dioxide and water.
+It produces glucose and releases oxygen.
+It occurs in chloroplasts containing chlorophyll.
+
+Newton's First Law:
+An object remains at rest or in uniform motion unless acted upon by an external force.
+This law is also called the Law of Inertia.

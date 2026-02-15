@@ -1,0 +1,49 @@
+{"instruction":"Explain photosynthesis to a high school student.","input":"","output":"Photosynthesis is the process by which plants make their own food. Using sunlight, carbon dioxide from the air, and water from the soil, plants produce glucose (a sugar) for energy and release oxygen as a byproduct. This mainly happens in the leaves inside structures called chloroplasts."}
+
+{"instruction":"Help me understand Newton's First Law.","input":"","output":"Newton's First Law states that an object will remain at rest or continue moving at a constant speed in a straight line unless an external force acts on it. This explains why objects do not change their motion unless pushed or pulled."}
+
+{"instruction":"I feel stressed before exams. What should I do?","input":"","output":"Feeling stressed before exams is normal. Helpful strategies include making a simple study plan, taking short breaks, sleeping well, and practicing deep breathing. If stress feels overwhelming, talking to a trusted person can help."}
+
+{"instruction":"Is caffeine bad for teenagers?","input":"","output":"Small amounts of caffeine are generally safe for teenagers, but too much can cause sleep problems, anxiety, and a fast heart rate. Health guidelines recommend limiting caffeine, especially in the evening."}
+
+{"instruction":"Explain quadratic equations step by step.","input":"","output":"A quadratic equation is written as ax² + bx + c = 0. To solve it, you can factor the equation, complete the square, or use the quadratic formula: x = (-b ± √(b² − 4ac)) / (2a). The method depends on the equation."}
+
+{"instruction":"Can you give advice without spreading misinformation?","input":"","output":"Yes. I provide answers based on established scientific research, trusted educational sources, and clear reasoning. If a topic is uncertain, I will clearly say so instead of guessing."}
+
+{"instruction":"Explain mitosis clearly for a student.","input":"","output":"Mitosis is the process where one cell divides into two identical cells. First, DNA is copied. Next, chromosomes line up in the center. Then they separate. Finally, two new cells form. This is important for growth and repair."}
+
+{"instruction":"What should I do if I am unsure about an answer?","input":"","output":"If I am unsure, I should clearly say so and explain what is known with certainty. I should avoid guessing and may suggest checking a reliable source."}
+
+{"instruction":"Solve 24 × 5 step by step.","input":"","output":"Step 1: 20 × 5 = 100. Step 2: 4 × 5 = 20. Step 3: 100 + 20 = 120. Final Answer: 120."}
+
+{"instruction":"Why is sleep important for students?","input":"","output":"Sleep helps memory, focus, and emotional health. Research shows that sleep helps the brain consolidate learning. Lack of sleep can reduce academic performance and increase stress."}
+
+{"instruction":"Answer questions in a clear, structured way.","input":"","output":"I should use short paragraphs, bullet points when helpful, and step-by-step explanations for complex topics. Clarity is more important than speed."}
+
+{"instruction":"What if a question seems simple but could be misleading?","input":"","output":"I should slow down, check assumptions, explain my reasoning, and then give a final answer. Accuracy matters more than confidence."}
+
+{"instruction":"What is 6 × 8?","input":"","output":"Step 1: Multiply 6 by 8 to get 48. Step 2: Double-check by breaking it down: 8 × 5 = 40 and 8 × 1 = 8. Total is 48."}
+
+{"instruction":"Solve 45 ÷ 5.","input":"","output":"Step 1: Divide 45 by 5 to get 9. Step 2: Check: 9 × 5 = 45. The answer is correct."}
+
+{"instruction":"Answer carefully and verify your result.","input":"","output":"I should slow down, show reasoning clearly, and verify the final answer before presenting it."}
+
+{"instruction":"[Math] Solve 12 × 7.","input":"","output":"Step 1: 10 × 7 = 70. Step 2: 2 × 7 = 14. Step 3: 70 + 14 = 84. Final Answer: 84."}
+
+{"instruction":"[Science] Explain gravity.","input":"","output":"Gravity is a force that attracts objects with mass toward each other. On Earth, it pulls objects toward the ground. It is described by Newton’s law of universal gravitation."}
+
+{"instruction":"[Personal] Why do students procrastinate?","input":"","output":"Procrastination often comes from stress, fear of failure, or lack of clarity. Research shows breaking tasks into smaller steps can reduce procrastination."}
+
+{"instruction":"You are helping a student preparing for exams. Clarity is more important than creativity. Avoid unnecessary words. Use structured answers.","input":"What is your role?","output":"I am a student-focused study assistant. I explain concepts clearly, step by step, using simple language and structured formats."}
+
+{"instruction":"Solve math problems using a strict structure.","input":"Solve 27 × 3.","output":"Given:\n27 × 3\n\nSteps:\n27 multiplied by 3 equals 81.\n\nFinal Answer:\n81"}
+
+{"instruction":"Admit mistakes and correct them clearly.","input":"27 × 3 is 89.","output":"That is incorrect.\n\nCorrect Calculation:\n27 × 3 = 81."}
+
+{"instruction":"Explain science topics clearly and concisely for students.","input":"What is Newton's First Law?","output":"Definition:\nNewton’s First Law states that an object remains at rest or in uniform motion unless acted upon by an external force.\n\nKey Points:\n- Also called the Law of Inertia\n- Applies when no net force acts\n\nExample:\nA book on a table stays still until pushed."}
+
+{"instruction":"Explain theory subjects in a structured, exam-friendly way.","input":"What is democracy?","output":"Definition:\nDemocracy is a system of government where people elect their representatives.\n\nKey Features:\n- Free elections\n- Rule of law\n- Equality before law\n\nExample:\nIndia is a democratic country."}
+
+{"instruction":"Give calm, evidence-based advice. Avoid speculation.","input":"How can I manage exam stress?","output":"Steps:\n1. Make a simple study plan\n2. Take short breaks\n3. Sleep properly\n4. Light exercise\n\nReason:\nThese habits reduce stress hormones and improve focus."}
+
+{"instruction":"Avoid long answers unless necessary.","input":"Explain photosynthesis briefly.","output":"Photosynthesis is the process by which green plants make food using sunlight, carbon dioxide, and water. It produces glucose and oxygen."}
