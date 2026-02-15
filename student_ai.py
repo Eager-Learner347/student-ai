@@ -5,18 +5,19 @@
 import re
 import json
 import os
-import wikipedia
+import time
+import requests
+
 import faiss
 from sentence_transformers import SentenceTransformer
 
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import (
+    AutoTokenizer,
+    AutoModelForCausalLM,
+    BitsAndBytesConfig
+)
 from peft import PeftModel
-
-from serpapi import GoogleSearch
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 # ======================
@@ -31,7 +32,7 @@ with open("kb_docs.json", "r", encoding="utf-8") as f:
 
 
 # ======================
-# LOAD MODEL
+# LOAD MODEL (AUTO GPU/CPU)
 # ======================
 
 base_model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
@@ -39,16 +40,42 @@ lora_path = "student_ai_lora"
 
 tokenizer = AutoTokenizer.from_pretrained(base_model)
 
-model = AutoModelForCausalLM.from_pretrained(
-    base_model,
-    load_in_4bit=True,
-    device_map="auto"
-)
+if torch.cuda.is_available():
+    print("🚀 CUDA detected. Loading 4-bit quantized model...")
+
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_compute_dtype=torch.float16,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4"
+    )
+
+    model = AutoModelForCausalLM.from_pretrained(
+        base_model,
+        quantization_config=bnb_config,
+        device_map="auto"
+    )
+
+else:
+    print("⚠ CUDA not detected. Loading CPU model (slower)...")
+
+    model = AutoModelForCausalLM.from_pretrained(
+        base_model,
+        device_map="cpu"
+    )
 
 model = PeftModel.from_pretrained(model, lora_path)
 model.eval()
 
 print("🧠 Student AI with RAG + Tool Routing ready. Type 'exit' to quit.\n")
+
+
+# ======================
+# MEMORY SYSTEM
+# ======================
+
+chat_history = []
+MAX_HISTORY = 6
 
 
 # ======================
@@ -97,55 +124,63 @@ def route_tool(query):
 
 
 # ======================
-# WIKIPEDIA FETCH
+# WIKIPEDIA (REST + RETRY)
 # ======================
 
-def fetch_wikipedia(query):
+def fetch_wikipedia(query, retries=3, timeout=5):
+    url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{query.replace(' ', '_')}"
+
+    for _ in range(retries):
+        try:
+            response = requests.get(url, timeout=timeout)
+            if response.status_code == 200:
+                data = response.json()
+                return data.get("extract")
+        except requests.exceptions.RequestException:
+            time.sleep(1)
+
+    return None
+
+
+# ======================
+# DUCKDUCKGO FALLBACK
+# ======================
+
+def fetch_duckduckgo(query, timeout=5):
+    url = "https://api.duckduckgo.com/"
+    params = {
+        "q": query,
+        "format": "json",
+        "no_redirect": 1,
+        "no_html": 1
+    }
+
     try:
-        return wikipedia.summary(query, sentences=4)
-    except wikipedia.exceptions.DisambiguationError as e:
-        return f"Multiple meanings found: {e.options[:3]}"
-    except wikipedia.exceptions.PageError:
+        response = requests.get(url, params=params, timeout=timeout)
+        data = response.json()
+        return data.get("AbstractText")
+    except requests.exceptions.RequestException:
         return None
 
 
 # ======================
-# WEB SEARCH
-# ======================
-
-def web_search(query):
-    params = {
-        "q": query,
-        "api_key": os.getenv("SERPAPI_KEY"),
-        "engine": "google",
-        "num": 3
-    }
-
-    search = GoogleSearch(params)
-    results = search.get_dict()
-
-    snippets = ""
-    for res in results.get("organic_results", []):
-        if "snippet" in res:
-            snippets += res["snippet"] + "\n"
-
-    return snippets.strip()
-
-
-# ======================
-# SEMANTIC RETRIEVER
+# SEMANTIC RETRIEVER (FAISS)
 # ======================
 
 def retrieve_context(query, top_k=2):
-    query_vec = embedder.encode([query])
-    _, indices = faiss_index.search(query_vec, top_k)
+    try:
+        query_vec = embedder.encode([query])
+        _, indices = faiss_index.search(query_vec, top_k)
 
-    retrieved = ""
-    for idx in indices[0]:
-        if idx < len(kb_documents):
-            retrieved += kb_documents[idx] + "\n\n"
+        retrieved = ""
+        for idx in indices[0]:
+            if idx < len(kb_documents):
+                retrieved += kb_documents[idx] + "\n\n"
 
-    return retrieved.strip()
+        return retrieved.strip()
+
+    except Exception:
+        return None
 
 
 # ======================
@@ -154,6 +189,7 @@ def retrieve_context(query, top_k=2):
 
 while True:
     user_input = input("You: ")
+
     if user_input.lower() == "exit":
         break
 
@@ -163,33 +199,40 @@ while True:
     if tool == "math":
         result = solve_math(user_input)
         if result is not None:
-            print(
-                f"\nAssistant:\n"
-                f"Given:\n{user_input}\n\n"
-                f"Steps:\nPerform the calculation.\n\n"
-                f"Check:\nRecalculate to verify.\n\n"
-                f"Final Answer:\n{result}\n"
-            )
+            print(f"\nAssistant:\n{result}\n")
             continue
 
-    # ---------- RETRIEVAL ----------
     context = ""
 
+    # ---------- KB ----------
     if tool == "kb":
         context = retrieve_context(user_input)
 
+    # ---------- WIKI ----------
     elif tool == "wiki":
         wiki_data = fetch_wikipedia(user_input)
+
         if wiki_data:
             context = f"Wikipedia:\n{wiki_data}"
+        else:
+            duck_data = fetch_duckduckgo(user_input)
+            if duck_data:
+                context = f"DuckDuckGo:\n{duck_data}"
 
+    # ---------- WEB ----------
     elif tool == "web":
-        web_data = web_search(user_input)
-        if web_data:
-            context = f"Web Search Results:\n{web_data}"
+        duck_data = fetch_duckduckgo(user_input)
+        if duck_data:
+            context = f"DuckDuckGo:\n{duck_data}"
 
     if not context:
         context = "Context is insufficient."
+
+    # ---------- MEMORY ----------
+    memory_context = ""
+    for exchange in chat_history[-MAX_HISTORY:]:
+        memory_context += f"User: {exchange['user']}\n"
+        memory_context += f"Assistant: {exchange['assistant']}\n"
 
     # ---------- PROMPT ----------
     prompt = f"""
@@ -203,11 +246,8 @@ RULES:
 CONTEXT:
 {context}
 
-FORMAT:
-Given:
-Steps:
-Check:
-Final Answer:
+CONVERSATION HISTORY:
+{memory_context}
 
 Question:
 {user_input}
@@ -219,11 +259,22 @@ Answer:
 
     output = model.generate(
         **inputs,
-        max_new_tokens=250,
-        temperature=0.2,
+        max_new_tokens=200,
+        temperature=0.3,
         repetition_penalty=1.2,
         do_sample=True
     )
 
     response = tokenizer.decode(output[0], skip_special_tokens=True)
+
+    # Clean output (hide system prompt)
+    if "Answer:" in response:
+        response = response.split("Answer:")[-1].strip()
+
     print("\nAssistant:\n", response, "\n")
+
+    # Save to memory
+    chat_history.append({
+        "user": user_input,
+        "assistant": response
+    })
